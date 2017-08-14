@@ -1,0 +1,275 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="ie9 no-js"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html class="no-js"> <!--<![endif]-->  
+<head>
+  <meta charset="utf-8" />
+  <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' /><![endif]-->
+
+  <title>
+  {{ page_title }}{% if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif %}{% if current_page != 1 %} &ndash; Page {{ current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
+
+  {% if page_description %}
+  <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
+
+  <link rel="canonical" href="{{ canonical_url }}" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  {% include 'open-graph-tags' %}
+  {% include 'twitter-card' %}
+
+  {{ content_for_header }}
+  
+  {{ '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' | stylesheet_tag }}  
+  
+  {% if template contains 'product.one-birthstone' %}  
+  {{ 'jquery.jscrollpane.css'  | asset_url | stylesheet_tag }}
+  {% endif %}
+  
+  {{ 'style.scss.css' | asset_url | stylesheet_tag }}
+  {{ 'social/social-icons.css' | global_asset_url | stylesheet_tag }}
+  {{ '//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css' | stylesheet_tag }}
+  
+  {{ '//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,400italic,600italic,700italic' | stylesheet_tag }}
+  {{ '//fonts.googleapis.com/css?family=Montserrat:400,600,700,800' | stylesheet_tag }}
+  {{ '//fonts.googleapis.com/css?family=Lora:400,700' | stylesheet_tag }}
+
+  <!--[if lt IE 9]>
+  {{ '//html5shiv.googlecode.com/svn/trunk/html5.js' | script_tag }}
+  <![endif]-->
+
+  {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+  {% if template contains 'customers' %}  
+  {{ 'customer_area.js'  | shopify_asset_url | script_tag }}
+  {% endif %}
+  
+  <!-- Additional Shopify helpers that will likely be added to the global shopify_common.js some day soon. -->
+  {{ 'shopify_common.js'  | asset_url | script_tag }}
+
+  {{ 'option_selection.js' | shopify_asset_url | script_tag }}
+
+  {{ '//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js' | script_tag }}
+  {{ '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' | script_tag }}
+  
+  {{ 'wow.min.js' | asset_url | script_tag }}
+  {{ 'animate.css' | asset_url | stylesheet_tag }}
+  <script>jQuery('html').removeClass('no-js').addClass('js');</script>
+  <script>new WOW().init();</script>
+
+</head>
+
+<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}" >
+
+  <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
+    <div class="gf-menu-device-wrapper">
+      <div class="gf-menu-device-container">
+        {% include 'site-nav' %}
+      </div>
+    </div>             
+  </nav>
+  <div class="topheader">
+    <div class="container">
+      <div class="row">
+        <div class="promo half column left-aligned">
+          <div class="contents">
+          	15% off earrings when you use coupon <b>EXAMPLES</b>        
+          </div>
+        </div>
+        <div class="half column right-aligned scart">
+          <div class="column flow-opposite searchcolumn">
+            <form action="/search" method="get" class="search-form right" role="search">
+              <input name="q" type="search" id="search-field" placeholder="Search..." value="{{ search.terms | escape }}" />
+              <button type="submit" id="search-submit" value="Search" />
+            </form>
+          </div>
+          <div class="column flow-opposite cartcolumn">
+            <div class="cart-link">
+              <a href="/cart"><img src="{{ 'cart.png' | asset_url }}" /> {{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }}</a>
+            </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+  </div>
+  <header class="headerblock">
+    <div class="container clearfix">
+      <div class="fourth column left-aligned logoblock">
+        {% if settings.use_logo %}
+        <a id="logo" href="/">
+          {{ 'logo.png' | asset_url | img_tag: shop.name }}
+        </a>
+        {% else %}
+        <a id="site-title" href="/">
+          {{ shop.name }}
+        </a>
+        {% endif %}
+      </div>
+      <div class="menublock">
+        {% include 'site-nav' %}
+      </div>
+    </div>    
+  </header>
+  <div class="header-mobile">
+    <div class="topmenu">
+      <div class="container clearfix">
+      <div class="menu-block visible-phone">
+      </div>
+      <div class="logoblock">
+        {% if settings.use_logo %}
+        <a id="logo" href="/">
+          {{ 'logo.png' | asset_url | img_tag: shop.name }}
+        </a>
+        {% else %}
+        <a id="site-title" href="/">
+          {{ shop.name }}
+        </a>
+        {% endif %}
+      </div>
+      <div class="right-menu-block clearfix">
+        <div class="search-btn">
+        </div>
+        <a href="/cart" class="cart">
+          <div class="smalltext">
+          {{ cart.item_count }} 
+          </div>
+        </a>
+      </div>
+      </div>
+    </div>
+    <div class="searchbox clearfix">
+      <form action="/search" method="get" class="container" role="search">
+        <div class="container row">
+        <input name="q" type="search" id="search-field" placeholder="Search..." value="{{ search.terms | escape }}" />
+        </div>
+      </form>
+    </div>
+    <div class="promo">
+      <div class="contents">
+        15% off earrings when you use coupon <b>EXAMPLES</b>        
+      </div>
+    </div>
+  </div>
+  {% if template == 'index' %}
+  	{% include 'home-slider' %}
+  {% endif %}
+  <div class="container">
+
+    <div id="main" role="main">
+      {% comment %}}
+        We have a template file to render.
+        That's what content_for_layout is for.
+      {% endcomment %}
+      {{ content_for_layout }}
+    </div>
+
+    
+
+    {% comment %}Shopify does not support Internet Explorer 6 nor 7. It does encourage themes to support IE8 until the end of 2014.{% endcomment %}
+    <!--[if lt IE 8]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+    
+  </div><!-- end of #container -->
+
+  <footer class="row">
+    <div class="container">
+      <div class="footerblock row">
+        <div class="half column left-aligned info">
+          <div class="half column left-aligned logoblock">
+            {% if settings.use_footer_logo %}
+            <a id="logo" href="/">
+              {{ 'footerlogo.png' | asset_url | img_tag: shop.name }}
+            </a>
+            {% else %}
+            <a id="site-title" href="/">
+              {{ shop.name }}
+            </a>
+            {% endif %}
+          </div>
+          <div class="half column left-aligned getintouch">
+            <p class="title">GET IN TOUCH</p>
+            <p class="content place">{{ settings.address }}</p>
+            <p class="content email">{{ settings.email }}</p>
+            <p class="content phone">{{ settings.phone }}</p>
+          </div>
+        </div>
+        <div class="half column left-aligned">
+          <div class="third column left-aligned">
+            <p class="title">Service</p>
+            {% if linklists.footer-service.links.size > 0 %}
+            {% for link in linklists.footer-service.links %}
+            <p class="content"><a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a></p>
+            {% endfor %}
+            {% endif %}
+          </div>
+          <div class="third column left-aligned">
+            <p class="title">Company</p>
+            {% if linklists.footer-company.links.size > 0 %}
+            {% for link in linklists.footer-company.links %}
+            <p class="content"><a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a></p>
+            {% endfor %}
+            {% endif %}
+          </div>
+          <div class="third column left-aligned">
+            <p class="title">Connect</p>
+            {% if linklists.footer-connect.links.size > 0 %}
+            {% for link in linklists.footer-connect.links %}
+            <p class="content"><a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a></p>
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>   
+      <div class="footermobileblock row">
+        <p>
+          {% if settings.use_footer_logo %}
+          <a id="logo" href="/">
+            {{ 'footerlogo.png' | asset_url | img_tag: shop.name }}
+          </a>
+          {% else %}
+          <a id="site-title" href="/">
+            {{ shop.name }}
+          </a>
+          {% endif %}
+        </p>
+        <center>
+        <div class="mobilecontacinfo">          
+        <div class="content place">{{ settings.address }}</div>        
+        <p class="content phone">{{ settings.phone }}</p>
+        <p class="content email">{{ settings.email }}</p>
+        </div>
+        </center>
+        <center>
+          <div class="linksblock clearfix">
+          {% if linklists.mobile-footerlinks.links.size > 0 %}
+          {% for link in linklists.mobile-footerlinks.links %}
+          <div class="links"><a href="{{ link.url }}" title="{{ link.title }}"{% if link.active %} class="active"{% endif %}>{{ link.title }}</a></div>
+          {% endfor %}
+          {% endif %}
+          </div>
+        </center>
+      </div>
+    </div>
+    <div class="footerbottom">
+      <div class="container">
+      <p role="contentinfo" class="small-print">&copy; {{ "now" | date: "%Y" }} {{ shop.name }}. ALL RICHTS RESERVED. </p>
+      </div>
+    </div>
+    </footer>
+  {% if template contains 'product.one-birthstone' %}  
+  {{ 'jScrollPane.js'  | asset_url | script_tag }}
+  {{ 'jquery.mousewheel.js'  | asset_url | script_tag }}
+  {{ 'SelectBox.js'  | asset_url | script_tag }}
+  {% endif %}
+  
+  {{ 'shop.js'  | asset_url | script_tag }}
+  {{ 'tooltip.js' | asset_url | script_tag }}
+  
+
+</body>
+</html>

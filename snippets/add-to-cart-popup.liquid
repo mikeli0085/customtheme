@@ -1,0 +1,334 @@
+<div class="modal fade" tabindex="-1" role="dialog" id="add-to-cart-popup">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><img src="{{ 'ui-16px-1_simple-remove.svg' | asset_url }}"></button>
+        <h4 class="modal-title">YOUR ORDER</h4>
+      </div>
+      <div class="modal-body">
+        <div class="product row">
+          <div class="col-xs-3">
+            <img src="" class="variant-image img-responsive">
+          </div>
+          <div class="col-xs-9">
+            <h4>{{ product.title }}</h4>
+            <ul class="product-options">
+              {% for option in product.options %}
+              <li class="product-option product-option{{forloop.index}}">{{ option }}: <span class="variant-option"></span></li>
+              {% endfor %}
+            </ul>
+
+            <h5>Quantity</h5>
+            <div class="qty-selector">
+              <button class="minus">{{ 'icon-minus.svg' | asset_url | img_tag }}</button><input class="quantity" name="quantity" value="1"><button class="plus">{{ 'icon-plus.svg' | asset_url | img_tag }}</button>
+            </div>
+
+            <div class="total-price"></div>
+
+            <div id="custom-data" class="hidden"></div>
+            
+            <div class="cart-addon hidden">
+              + <span class="item-price"></span> from your 
+              <a href="#" id="add-to-and-view-cart">cart</a>.
+              <div class="inline-total">
+                <span class="item-price-total"></span> total
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-checkout" id="add-to-cart-popup-action">
+          <svg class="nc-icon glyph" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px"
+               viewBox="0 0 24 24"><g>
+            <path fill="#ffffff" d="M20,8h-2V6c0-3.309-2.691-6-6-6S6,2.691,6,6v2H4C3.448,8,3,8.448,3,9v14c0,0.552,0.448,1,1,1h16
+                    c0.552,0,1-0.448,1-1V9C21,8.448,20.552,8,20,8z M13,17.816L13,20h-2l0-2.184C9.839,17.402,9,16.302,9,15c0-1.654,1.346-3,3-3
+                    s3,1.346,3,3C15,16.302,14.162,17.402,13,17.816z M16,8H8V6c0-2.206,1.794-4,4-4s4,1.794,4,4V8z"></path>
+            </g>
+          </svg><span class="button-label">Checkout</span>
+        </button>
+        <div class="checkout-badges">
+          {{ 'card-badges-sized.png' | asset_url | img_tag: 'We accept all major credit cards and Paypal' }}
+          {{ 'comodo-secure-sized.png' | asset_url | img_tag: 'Secured by Comodo' }}
+          {{ 'shopify-secure-sized.png' | asset_url | img_tag: 'Guaranteed Secure by Shopify' }}
+        </div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+  var variant_price = 0;
+  var variant_id    = null;
+  var variant_form  = null;
+  var cart_price    = 0;
+  var custom_data   = {};
+  jQuery.fn.variantPopup = function(variant, form) {
+
+    var frmRX = new RegExp('\\[(.+?)\\]');
+
+    $('#custom-data input').remove();
+    $('.product-options .product-option-custom').remove();
+    custom_data = {};
+
+    if(form) {
+
+      variant_form = form;
+
+      var srlz = variant_form.serializeArray();
+
+      for(var i = 0; i < srlz.length; i++)
+      {
+        if(srlz[i].name.indexOf('properties') > -1)
+        {
+          var anm = frmRX.exec(srlz[i].name);
+
+          if(anm.length != 2) continue;
+
+          var nm = anm[1];
+
+          $('#custom-data').append('<input type="hidden" name="'+ srlz[i].name +'" value="'+ srlz[i].value +'">');
+          $('.product-options').append('<li class="product-option product-option-custom">\
+            '+ nm +': <span class="variant-option">'+ srlz[i].value +'</span></li>');
+
+          custom_data[nm] = srlz[i].value;
+	    }
+      }
+    }
+
+    if(variant) {
+      {% for i in product.images limit:1 %}
+      var product_image = "{{ i.src | product_img_url }}";
+      {% else %}
+      var product_image = '';
+      {% endfor %}
+      
+      var vops = this.find('.product-options');
+      var prod1 = vops.find('.product-option1');
+      var prod2 = vops.find('.product-option2');
+      var prod3 = vops.find('.product-option3');
+      
+      for(var i = 1; i < 4; i++)
+      {
+        if(variant['option'+ i] && 
+           variant['option'+ i].length && 
+           vops.find('.product-option'+ i).length)
+        {
+          vops.find('.product-option'+ i +' .variant-option').html(variant['option'+ i]);
+        }
+      }
+
+      this.find('.variant-image').removeClass('hidden');
+      if(variant.featured_image)
+      {
+      	this.find('.variant-image').attr('src', variant.featured_image.src);
+      }
+      else
+      {
+        if(product_image.length)
+  	      this.find('.variant-image').attr('src', product_image);
+      	else
+            this.find('.variant-image').addClass('hidden');
+      }
+      
+      variant_price = variant.price;
+      variant_id = variant.id;
+      
+      $('.qty-selector input').trigger('change');
+    }
+    
+    $('#add-to-cart-popup').on('show.bs.modal', function () {
+      $(document).trigger('fb-addtocart');
+    });
+
+  };
+  
+  jQuery(function($){
+
+      $.get('/cart.js',null,function(data) {
+        
+        if(data.item_count > 0)
+        {
+          
+          $('.cart-addon').find('.num-items')
+          .html(data.item_count +' item'+ (data.item_count > 1 ? 's' : ''));
+
+          $('.cart-addon').find('.item-price')
+          .html(Shopify.formatMoney(data.total_price, "{{shop.money_format }}"));
+
+          $('.cart-addon').removeClass('hidden');
+
+          cart_price = parseInt(data.total_price);
+
+          $('.total-price').addClass('with-cart');
+
+          $('.qty-selector input').trigger('change');
+        }
+
+      },'json');
+
+
+      function incrdecr(ord) {
+        var inp = $('.qty-selector input');
+        var val = parseInt(inp.val());
+
+        if(!$.isNumeric(inp.val()) || val+ord < 1)
+        {
+          return inp.val(1);
+        }
+
+        inp.val(val + ord);
+
+        $('.qty-selector input').trigger('change');
+      }
+
+      $('.qty-selector .minus').click(function(){
+        incrdecr(-1);
+      });
+
+      $('.qty-selector .plus').click(function(){
+        incrdecr(1);
+      });
+
+      $('.qty-selector input').on('change', function(){
+        if(!$.isNumeric($(this).val()))
+        {
+          $(this).val(1);
+        }
+
+        //calc price
+        var p = (variant_price * $(this).val());
+
+        var pt = p + cart_price;
+
+        $('#add-to-cart-popup .total-price').html(Shopify.formatMoney(p, "{{ shop.money_format }}"));
+
+        $('.cart-addon').find('.item-price-total').html(Shopify.formatMoney(pt, "{{ shop.money_format }}"));
+
+      });
+
+      var inpto;
+
+      $('.qty-selector input').on('keyup', function(){
+        if(inpto)
+        {
+          clearTimeout(inpto);
+          inpto = null;
+        }
+
+        inpto = setTimeout(function(){
+          $('.qty-selector input').trigger('change');
+        }, 1000);
+      }); 
+
+        $('#add-to-cart-popup').on('hidden.bs.modal', function(){
+          $('.qty-selector input').val(1);
+          $('.qty-selector input').trigger('change');
+        });
+
+      $('#add-to-cart-popup-action').click(function(){
+
+        $(this).attr('disabled', true);
+        $(this).find('.button-label').html('Heading to Checkout...');
+        
+        // Moving to modal show event
+        // $(document).trigger('fb-addtocart');
+
+        $.post('/cart/add.js', 
+          {quantity: $('.qty-selector input').val(), id: variant_id, properties: custom_data},
+         	function(status, data){
+            try {
+              $('body').append('<form action="/cart" method="post" id="cart-form">\
+              <input type="hidden" name="checkout" value="Checkout">\
+              </form>');
+              $('#cart-form').submit();
+            } catch (e) {
+              window.location = '/cart';
+            }
+          },'json');
+      });
+
+      $('#add-to-and-view-cart').click(function(e){
+
+        e.preventDefault();
+
+        $.post('/cart/add.js', 
+          {quantity: $('.qty-selector input').val(), id: variant_id, properties: custom_data},
+          function(status, data){
+            window.location = '/cart';
+          },'json');
+      });
+  });
+</script>
+
+{% if ring == 'yes' %}
+  {% if product.variants.size > 1 %}
+    <script>
+      jQuery(document).ready(function ($) {
+        /**
+         * Allow buyers to select ring size on checkout
+         *
+         * When checkout popup => clone select dropdown and replace the size on checkout
+         * When checkout size dropdown changes => change value on origin dropdown,
+         *      trigger change to the url changes and the variant_id global variable.
+         */
+          // option index for size dropdown
+          {% for option in product.options %}
+            {% if option == 'Size' %}
+              var sizeOptionIndex = {{ forloop.index0 }};
+            {% endif %}
+          {% endfor %}
+
+          var wasAlreadyCloned = false,
+              $addToCartPopup = $('#add-to-cart-popup'),
+              $origin, $target,
+              moveSizeSelectionToLast = function(){
+                  if($target){
+                      $target.appendTo($("ul.product-options"));
+                  }
+              },
+              checkoutSizeSelectChangeListener = function () {
+                  // original size select
+                  // this will trigger the change in url, so the variant_id will be set correctly
+                  $origin.val(this.value).change();
+
+                  $("#add-to-cart-popup-action").prop("disabled", !this.value);
+                  moveSizeSelectionToLast();
+              },
+              getQtySelectorsWidth = function(){
+                  var totalWidth = 0;
+                  $(".qty-selector *").each(function() {
+                      totalWidth += parseInt($(this).outerWidth(), 10);
+                  });
+                  return totalWidth;
+              };
+
+          $addToCartPopup.on('show.bs.modal', function () {
+            if(!$target){
+              $target = $addToCartPopup.find('li.product-option' + (sizeOptionIndex+1));
+            }
+            if(!$origin){
+              $origin = $('#product-select-option-' + sizeOptionIndex);
+            }
+
+            if (!wasAlreadyCloned) {
+              // clone origin, change id and set val
+              var $cloned = $origin.clone()
+                      .prop('id', 'product-select-size-option')
+                      .val($origin.val());
+
+              // set size selection dropdown width equal to qty-selector
+              $cloned.css("width", getQtySelectorsWidth());
+
+              $target.html("<h5>Size</h5>").append($cloned);
+              wasAlreadyCloned = true;
+              $cloned.on("change", checkoutSizeSelectChangeListener);
+            } else {
+              $target.find('select').val($origin.val());
+            }
+            moveSizeSelectionToLast();
+          });
+      });
+    </script>
+  {% endif %}
+{% endif %}

@@ -1,0 +1,13 @@
+// Make sure you include inside a script tag
+// Display the in stock message
+if (inventory_in_stock && inventory_in_stock[variant.id]) {
+  jQuery('#variant-inventory-message span#inventory-in-stock').text(inventory_in_stock[variant.id]);
+  jQuery('#variant-inventory-message').show();
+  jQuery('#variant-for-holiday-input input[type=checkbox]').prop('checked', false);
+  jQuery('#variant-for-holiday-input').hide();
+  jQuery('#variant-made-to-order-message').hide();
+} else {
+  jQuery('#variant-made-to-order-message').show();
+  jQuery('#variant-for-holiday-input').show();
+  jQuery('#variant-inventory-message').hide();
+}

@@ -1,0 +1,27 @@
+<div class="toolbar clearfix">
+  <div class="viewblock right clearfix">
+    {% if collection.products_count > 1 %}
+    <label class="">Show </label>
+    <select class="view">
+      <option value="12" {% if products_per_page == 12 %} selected {% endif %} >12</option>
+      <option value="16" {% if products_per_page == 16 %} selected {% endif %} >16</option>
+      <option value="24" {% if products_per_page == 24 %} selected {% endif %} >24</option>
+     </select>
+    {% endif %}
+  </div>  
+  <div class="sortbyblock right clearfix">
+    {% if collection.products_count > 1 %}
+    <label class="">Sort By </label>
+    <select class="sort-by">
+      <option value="manual">Featured</option>
+      <option value="price-ascending">Price: Low to High</option>
+      <option value="price-descending">Price: Hight to Low</option>
+      <option value="title-ascending">A-Z</option>
+      <option value="title-descending">Z-A</option>
+      <option value="created-ascending">Oldest to Newest</option>
+      <option value="created-descending">Newest to Oldest</option>
+      <option value="best-selling">Best Selling</option>
+     </select>
+    {% endif %}
+  </div>    
+</div>

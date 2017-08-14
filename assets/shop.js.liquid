@@ -1,0 +1,173 @@
+/*============================*/
+/* Update main product image. */
+/*============================*/
+var switchImage = function(newImageSrc, newImage, mainImageDomEl) {
+  // newImageSrc is the path of the new image in the same size as originalImage is sized.
+  // newImage is Shopify's object representation of the new image, with various attributes, such as scr, id, position.
+  // mainImageDomEl is the passed domElement, which has not yet been manipulated. Let's manipulate it now.
+  jQuery(mainImageDomEl).parents('a').attr('href', newImageSrc.replace('_grande', '_1024x1024'));
+  jQuery(mainImageDomEl).attr('src', newImageSrc);  
+};
+
+jQuery(function($) {
+                    
+  /* Placeholder JS */
+  /*==========================*/
+  var test = document.createElement('input');
+  if (!('placeholder' in test)) {
+    $('[placeholder]').each(function(){
+      if ($(this).val() === '') {
+        var hint = $(this).attr('placeholder');
+        $(this).val(hint).addClass('hint');
+      }
+    });
+    $('[placeholder]').focus(function() {
+      if ($(this).val() === $(this).attr('placeholder')) {
+        $(this).val('').removeClass('hint');
+      }
+    }).blur(function() {
+      if ($(this).val() === '') {
+        $(this).val($(this).attr('placeholder')).addClass('hint');
+      }
+    });    
+  }
+
+  /* Form validation JS */
+  /*==========================*/
+
+  $('input.error, textarea.error').focus(function() {
+    $(this).removeClass('error');
+  });
+
+  $('form :submit').click(function() {
+    $(this).parents('form').find('input.hint, textarea.hint').each(function() {
+      $(this).val('').removeClass('hint');
+    });
+    return true;
+  });
+  
+  /* Remove SVG images to avoid broken images in all browsers that don't support SVG. */
+  /*==========================*/
+  
+  var supportsSVG = function() {
+    return document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Image', '1.1');
+  }  
+  if (!supportsSVG()) {
+    $('img[src*=".svg"]').remove();
+  }
+  
+  /* Prepare to have floated images fill the width of the design on blog pages on small devices. */
+  /*==========================*/ 
+    
+  var images = $('.article img').load(function() {
+    var src = $(this).attr('src').replace(/_grande\.|_large\.|_medium\.|_small\./, '.');
+    var width = $(this).width();
+    $(this).attr('src', src).attr('width', width).removeAttr('height');
+  });
+  
+  /* Update main product image when a thumbnail is clicked. */
+  /*==========================*/
+  $('.product-photo-thumb a').on('click', function(e) { 
+    e.preventDefault();
+    switchImage($(this).attr('href'), null, $('.product-photo-container img')[0]);
+  } );
+  
+  $('.swatch :radio').change(function() {
+
+    console.log( '.swatch :radio change event: ', this );
+    console.log( '.swatch :radio change event: ', $(this).val() );
+
+    var $this = $(this);
+    var optionIndex = $this.closest('.swatch').attr('data-option-index');
+    var optionValue = $this.val();
+    
+    $this.parent().parent().find('.header span').html($this.val());
+
+    $this
+      .closest('form')
+      .find('.single-option-selector')
+      .eq(optionIndex)
+      .val(optionValue)
+      .trigger('change');
+  });
+  
+  $('#add').click(function(){
+    /*
+     * Validate if product options are selected
+     * before opening add-to-cart-popup
+     */
+    var productOptionsSelects = $(".selector-wrapper select"),
+        notSelectedOption = productOptionsSelects.filter(function(k, el){
+          return !el.value;
+        }),
+        notSelectedOptionChangeListener = function(){
+          var $this = $(this);
+          if(this.value){
+            ShineOn.removeToolTip($this);
+            $this.off('change', notSelectedOptionChangeListener);
+          }
+        };
+
+    if(notSelectedOption.length){
+      ShineOn.scrollCenteredToElement(notSelectedOption);
+
+      ShineOn.showToolTip(notSelectedOption, 'Please make a selection');
+
+      notSelectedOption.on('change', notSelectedOptionChangeListener);
+    }else{
+      $('#add-to-cart-popup').modal('show');
+    }
+
+  });
+  
+});
+
+$( window ).load(function() {
+  if($('.collection-list .coll-image-wrap')){
+    $( ".collection-list .coll-image-wrap" ).each(function( index ) {
+      $(this).find('img').height($(this).width());
+    });
+  }
+  
+  if($('.collection-list .prod-image-wrap')){
+    $( ".collection-list .prod-image-wrap" ).each(function( index ) {
+      $(this).find('img').height($(this).width());
+    });
+  }
+  
+  if($('.clist .collectionitem')){
+    $( ".clist .collectionitem" ).each(function( index ) {
+      $(this).find('.img').height($(this).width());
+      $(this).find('img').height($(this).width());
+    });
+  }
+  
+  $('.swatch :radio').each(function( index ) {
+    
+    var $this = $(this);
+    if($this.is(":checked")){
+      $this.parent().parent().find('.header span').html($this.val());
+    }
+    
+  });
+});
+
+$(function() {
+  $('.view')
+  // select the current sort order
+  .bind('change', function() {
+    Shopify.queryParams.view = jQuery(this).val();
+    location.search = jQuery.param(Shopify.queryParams);
+  }
+  );
+  $('.search-btn').on('click', function(e) {
+    $('.searchbox').toggle( "slow", function() {
+    // Animation complete.
+  });
+  });
+  $('.menu-block.visible-phone').on('click', function(e) {
+    $(this).toggleClass('active');
+    $('body').toggleClass('cbp-spmenu-push-toright');
+    $('#cbp-spmenu-s1').toggleClass('cbp-spmenu-open');
+  });
+});

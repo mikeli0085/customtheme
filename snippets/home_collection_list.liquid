@@ -1,0 +1,32 @@
+<div class="hcollections">
+  <center class="wow fadeInUp" data-wow-duration=".5s">
+    <h1>Designed to be Worn With Pride.</h1>
+    <span>Over 321 unique niches to choose form</span>
+  </center>
+  <div class="clist row">
+    <ul class="grid clearfix">
+      {% for collection in collections limit:8 %}
+      <li class="four-per-row centered">
+        <div class="collectionitem">
+          <a href="{{ collection.url }}">
+          <div class="img">
+            {% if collection.image %}
+            <img src="{{ collection | img_url: 'grande' }}" alt="{{ collection.image.alt | escape }}" />
+            {% else %}
+            <img src="{{ collection.products.first | img_url: 'grande' }}" alt="{{ collection.title | escape }}" />
+            {% endif %}
+          </div>
+          <span>{{ collection.title }}</span>
+          </a>
+        </div>
+        {% cycle 'clear': '', '', '', '<div style="clear:both"></div>' %}
+      </li>
+      
+      {% endfor %}
+    </ul>
+  </div>  
+  <br/>
+  <center>
+  <button class="callbtn centered">EXPLORE ALL &#x2794;</button>
+  </center>
+</div>

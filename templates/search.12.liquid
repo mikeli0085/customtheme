@@ -1,0 +1,91 @@
+{% comment %}
+The search.liquid template is not a required template.
+That search.liquid template is included in the current theme to make it easier for you 
+to customize your /search page.
+Whether you are using your own template for the search page or not,
+the {{ content_for_header }} tag in theme.liquid will always output the following on the /search page:
+<link rel="stylesheet" href="//cdn.shopify.com/s/global/search.css" type="text/css" />
+So the /search page is always styled by a globally-hosted stylesheet called search.css.
+You may override and complement that CSS in your theme's stylesheet.
+We are using a div#searchresults below so that the styles defined in search.css get
+applied to the elements on this page; the 'searchresults' id is used in the CSS
+selectors inside search.css.
+{% endcomment %}
+{% comment %}
+  Important notes about pagination:
+  - Never access collection.products before the opening paginate tag.
+  - Never paginate by more than 50.
+{% endcomment %}
+
+{% assign products_per_page = 12 %}
+{% assign numbers = 'zero, one, two, three, four, five, six' | split: ',' %}
+{% assign products_per_row = settings.products_per_row | times: 1 %}
+{% assign products_per_row = numbers[products_per_row] | strip | append: '-per-row' %}
+
+
+{% comment %}
+  Re-use the .rte class wherever you output content that was added by a merchant using
+  the Rich Text Editor ( 'rte' stands for rich text editor ).
+  Style all HTML elements in that content the same way across the board.
+  Use the .rte class in your CSS to help maintain consistency.
+  Example: the h2 element should have the same size and color in:
+  - product descriptions
+  - collection descriptions
+  - page content
+  - blog post
+{% endcomment %}
+
+<h1 class="">Search Results for "{{ search.terms | escape }}"</h1>
+
+{% if search.results_count > 0 %}
+<div class="resultcount">
+  showed {{search.results_count}} results 
+</div>
+{% endif %}
+
+{% comment %}
+  Collection sorting. Needs the JavaScript that is at the bottom of this file.
+{% endcomment %}
+
+
+{% comment %}
+  Listing all tags within the current collection.
+  Shopify uses product tags to manage subcategories inside collections.
+  See 'How do I create subcategories of products?' at 
+  http://bit.ly/1j1Dti4 for details.
+{% endcomment %}
+
+{% if search.performed %}
+  {% paginate search.results by products_per_page %}
+	<div class="row collection-list">
+    {% include 'search-toolbar' with products_per_page %}
+      <ul class="grid clearfix">
+      {% for product in search.results %}
+        {% include 'product-grid-item' with products_per_row %}
+      {% else %}
+        <p>There are no products in this view.</p>
+      {% endfor %}
+      </ul>
+      
+    {% if paginate.pages > 1 %}
+    <div id="pagination" class="pagination centered">
+      {{ paginate | default_pagination }}
+    </div>
+    {% endif %}  
+	</div>    
+  {% endpaginate %}
+
+{% endif %}
+
+
+{% comment %}
+  JavaScript for collection sorting.
+{% endcomment %}
+<script>
+jQuery('.sort-by')
+  .val('{{ search.sort_by | default: search.default_sort_by }}')
+  .on('change', function() {
+    Shopify.queryParams.sort_by = jQuery(this).val();
+    location.search = jQuery.param(Shopify.queryParams).replace(/\+/g, '%20');
+  });
+</script>

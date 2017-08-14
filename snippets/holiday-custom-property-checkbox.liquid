@@ -1,0 +1,25 @@
+<!-- When the holiday is over, just comment out this to omit from all templates -->
+
+<div id="variant-for-holiday-input" style="display:none;">
+  <div class="form-group">
+    <label class="control control--checkbox">This is a gift for the holidays
+      <input id="holiday-checkbox" name="properties[For the holiday]" type="checkbox" value="Yes">
+      <div class="control__indicator"></div>
+    </label>
+    <i class="fa fa-question-circle"
+       data-toggle="tooltip"
+       data-placement="top"
+       {% if product.metafields.inventory.holiday_message %}
+       data-title="If this item does not ship in time for the {{ product.metafields.inventory.holiday_message }}, we’ll send a special {{ product.metafields.inventory.holiday_message }} card and a picture of the item to your shipping address"
+       {% else %}
+       data-title="If this item does not ship in time for the Christmas, we’ll send a special Christmas card and a picture of the item to your shipping address"
+       {% endif %}
+       ></i> 
+  </div>
+</div>
+
+<script>
+  jQuery(document).ready(function() {
+    jQuery('#variant-for-holiday-input .fa-question-circle').tooltip();
+  });
+</script>

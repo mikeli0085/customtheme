@@ -1,0 +1,39 @@
+<!-- Create a Javascript variable with variant stock quantities -->
+<script>
+  {% if product.variants %}
+    var inventory_in_stock = {};
+  
+    {% for variant in product.variants %}
+      {% if variant.metafields and variant.metafields.inventory and variant.metafields.inventory.in_stock %}
+        inventory_in_stock[{{variant.id}}] = {{variant.metafields.inventory.in_stock}}
+      {% else %}
+        inventory_in_stock[{{variant.id}}] = 0;
+      {% endif %}
+    {% endfor %}
+  
+  {% endif %}
+</script>
+
+<div id="variant-inventory-message" style="display: none;">
+  <div>
+    {{ 'christmas-bells.png' | asset_url | img_tag }}
+  </div>
+  <div class="message-wrap">
+    <p>This item ships in time for the holidays.</p>
+    {% if product.metafields.inventory.holiday_message %}
+    <p><span id="inventory-in-stock">123</span> left in stock for {{ product.metafields.inventory.holiday_message }} delivery!</p>
+    {% else %}
+    <p><span id="inventory-in-stock">123</span> left in stock for Christmas delivery!</p>
+    {% endif %}
+  </div>
+</div>
+
+<div id="variant-made-to-order-message" style="display: none;">
+  <div>
+    {{ 'delivery-truck.png' | asset_url | img_tag }}
+  </div>
+  <div class="message-wrap">
+    <p>This item is hand-made to order.</p>
+    <p><span id="inventory-in-stock">3-6</span> weeks until this custom piece ships.</p>
+  </div>
+</div>

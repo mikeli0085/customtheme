@@ -1,0 +1,44 @@
+<script>
+
+// This include supplementary javascript for birthstones.
+var $select_birthstone_el = jQuery('#birthstone, #top-birthstone, #bottom-birthstone, #left-birthstone, #right-birthstone, #bottom-lips');
+var $buy = jQuery('.btn-buy');
+
+if ($select_birthstone_el.length && $buy.length) {
+
+	$buy.on('mouseover click', function() {
+		if ($select_birthstone_el.first().val() == 'choose') {
+			/*$select_birthstone_el.tooltip({
+				placement: 'top',
+				title: 'Please make a selection'
+			});*/
+			//$select_birthstone_el.first().tooltip('show');
+            $('#select-birthstone').tooltip({
+				placement: 'top',
+				title: 'Please make a selection'
+			});
+            $('#select-birthstone').tooltip('show');
+			$('#select-birthstone').addClass('option-selector-error');
+			$buy.prop('disabled', true);
+		} else {
+			$buy.prop('disabled', false);
+			$('#select-birthstone').removeClass('option-selector-error');
+		}
+	});
+
+	$select_birthstone_el.on('change', function() {
+		var $el = jQuery(this);
+
+		if ($el.val() !== 'choose') {
+			$buy.prop('disabled', false);
+			$('#select-birthstone').tooltip('hide');
+			$('#select-birthstone').tooltip('destroy');
+			$el.removeClass('option-selector-error');
+		}
+	});
+
+} else {
+	console.log("Warning: birthstone-sanity-check snippet requires .btn-buy and one of (#birthstone, #top-birthstone, #bottom-birthstone) elements.");
+}
+
+</script>
